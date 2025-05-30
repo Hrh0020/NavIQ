@@ -57,9 +57,30 @@ if page == "Main Dashboard":
         "Net_Yield_%": "{:.2f}%"
     }), use_container_width=True)
 
-# Placeholder tabs for expansion
+# Performance tab placeholder
 elif page == "Performance":
     st.subheader("📊 Detailed Sleeve & Ticker Analytics Coming Soon")
-elif page == "Research":
-    st.subheader("🔬 Research Terminal (AI integration planned)")
 
+# Research tab implementation
+elif page == "Research":
+    st.title("🔍 Research Workspace")
+
+    st.subheader("📥 Ticker Selector or Upload")
+    ticker_input = st.text_input("Enter ticker symbol (e.g., AAPL)")
+    file_upload = st.file_uploader("Or upload a file with tickers", type=["csv", "xlsx"])
+
+    if ticker_input or file_upload:
+        st.subheader("📊 Ticker Analysis Preview")
+        st.info("GPT-based financial summary, earnings analysis, and trend notes will appear here.")
+    else:
+        st.warning("Enter a ticker or upload a file to begin analysis.")
+
+    st.subheader("✅ Decision Tracker")
+    decision = st.radio("Action", ["Add to Vault", "Needs More Info", "Reject"])
+    notes = st.text_area("Optional Notes", placeholder="Add interim thoughts or research notes...")
+
+    if st.button("Save Analysis Decision"):
+        st.success("Analysis decision saved for this ticker (simulated).")
+
+    st.markdown("---")
+    st.caption("This is a working area. Nothing here is committed to the Vault unless explicitly added.")
