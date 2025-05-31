@@ -6,26 +6,45 @@ import plotly.graph_objs as go
 st.set_page_config(page_title="NavIQ | Portfolio Dashboard", layout="wide")
 
 NAVIQ_ACCENT = "#10305C"  # Deep institutional blue
+CARD_BG = "#181C22"       # Slightly lighter than Streamlit's dark for stat cards
+CARD_TEXT = "#FFFFFF"     # White text for dark cards
 
-# Custom CSS for sleek high-finance look
+# --- Custom CSS to fix stat cards for dark mode ---
 st.markdown(f"""
     <style>
-        .sidebar .sidebar-content {{
+        /* Sidebar */
+        [data-testid="stSidebar"] {{
             background: {NAVIQ_ACCENT} !important;
         }}
-        .css-18e3th9 {{
-            background-color: #f7f8fa !important;
+        /* Main background */
+        .stApp {{
+            background-color: #121418;
         }}
-        .css-10trblm, .css-1d391kg {{
-            font-family: 'Inter', 'Lato', 'Roboto', sans-serif !important;
-        }}
+        /* Stat Cards */
         .stat-card {{
+            border-radius: 0.75rem;
+            background: {CARD_BG};
+            color: {CARD_TEXT} !important;
+            box-shadow: 0 2px 8px 0 rgba(16,48,92,.13);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            font-family: 'Inter', 'Lato', 'Roboto', sans-serif;
+        }}
+        /* White card for charts */
+        .white-card {{
             border-radius: 0.75rem;
             background: #fff;
             box-shadow: 0 2px 8px 0 rgba(16,48,92,.08);
             padding: 1.5rem;
-            margin-bottom: 1.25rem;
+            margin-bottom: 2rem;
         }}
+        /* Table tweaks */
+        .stDataFrame tbody tr {{
+            background-color: #161B22 !important;
+            color: #fff !important;
+        }}
+        /* Remove Streamlit footer */
+        footer {{visibility: hidden;}}
     </style>
 """, unsafe_allow_html=True)
 
@@ -51,39 +70,43 @@ alloc_vals = [cash_equiv, equities, options]
 # --- Stat Cards ---
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    st.markdown(f"<div class='stat-card'><b>Portfolio Value</b><br><span style='font-size:2rem;'>${portfolio_value:,.2f}</span></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='stat-card'><b>Portfolio Value</b><br><span style='font-size:2rem;color:{CARD_TEXT};'>${portfolio_value:,.2f}</span></div>", unsafe_allow_html=True)
 with col2:
-    st.markdown(f"<div class='stat-card'><b>Cash %</b><br><span style='font-size:2rem;'>{round((cash_equiv/portfolio_value)*100, 1)}%</span></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='stat-card'><b>Cash %</b><br><span style='font-size:2rem;color:{CARD_TEXT};'>{round((cash_equiv/portfolio_value)*100, 1)}%</span></div>", unsafe_allow_html=True)
 with col3:
-    st.markdown(f"<div class='stat-card'><b>Equity %</b><br><span style='font-size:2rem;'>{round((equities/portfolio_value)*100, 1)}%</span></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='stat-card'><b>Equity %</b><br><span style='font-size:2rem;color:{CARD_TEXT};'>{round((equities/portfolio_value)*100, 1)}%</span></div>", unsafe_allow_html=True)
 with col4:
-    st.markdown(f"<div class='stat-card'><b>Options %</b><br><span style='font-size:2rem;'>{round((options/portfolio_value)*100, 1)}%</span></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='stat-card'><b>Options %</b><br><span style='font-size:2rem;color:{CARD_TEXT};'>{round((options/portfolio_value)*100, 1)}%</span></div>", unsafe_allow_html=True)
 
 st.write(" ")
 
-# --- Allocation Donut Chart ---
-alloc_fig = go.Figure(data=[go.Pie(
-    labels=alloc_labels,
-    values=alloc_vals,
-    hole=.7,
-    marker=dict(colors=[NAVIQ_ACCENT, "#f1f5fa", "#ADB9C6"])
-)])
-alloc_fig.update_layout(
-    showlegend=True,
-    legend=dict(orientation="h", y=-0.2),
-    margin=dict(l=40, r=40, t=10, b=10),
-    height=320,
-    paper_bgcolor='rgba(0,0,0,0)',
-    plot_bgcolor='rgba(0,0,0,0)',
-    font=dict(family="Inter, Lato, sans-serif", size=14, color="#222")
-)
-st.plotly_chart(alloc_fig, use_container_width=True)
+# --- Allocation Donut Chart in White Card ---
+with st.container():
+    st.markdown('<div class="white-card">', unsafe_allow_html=True)
+    alloc_fig = go.Figure(data=[go.Pie(
+        labels=alloc_labels,
+        values=alloc_vals,
+        hole=.7,
+        marker=dict(colors=[NAVIQ_ACCENT, "#f1f5fa", "#ADB9C6"])
+    )])
+    alloc_fig.update_layout(
+        showlegend=True,
+        legend=dict(orientation="h", y=-0.2),
+        margin=dict(l=40, r=40, t=10, b=10),
+        height=320,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(family="Inter, Lato, sans-serif", size=14, color="#222")
+    )
+    st.plotly_chart(alloc_fig, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # --- Portfolio Value Over Time (Mock Data) ---
 hist_df = pd.DataFrame({
     "Month": ["Feb", "Mar", "Apr"],
     "Portfolio Value": [3016.95, 3107.65, 6934.31]
 })
+st.markdown('<div class="white-card">', unsafe_allow_html=True)
 line_fig = go.Figure()
 line_fig.add_trace(go.Scatter(
     x=hist_df["Month"], y=hist_df["Portfolio Value"],
@@ -99,6 +122,7 @@ line_fig.update_layout(
     font=dict(family="Inter, Lato, sans-serif", size=14, color="#222")
 )
 st.plotly_chart(line_fig, use_container_width=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # --- Open Positions Table ---
 st.markdown("### Open Positions")
@@ -125,4 +149,3 @@ for act in activity:
 
 st.markdown("<br><br>", unsafe_allow_html=True)
 st.caption("NavIQ © 2025 | High Finance Portfolio Intelligence")
-
