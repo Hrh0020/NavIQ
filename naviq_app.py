@@ -1,86 +1,58 @@
-import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Sidebar } from "@/components/ui/sidebar";
+import { LayoutDashboard, BarChart2, Settings } from "lucide-react";
 
-# Page config
-st.set_page_config(page_title="NavIQ", layout="wide")
-st.title("📊 NavIQ Portfolio Dashboard")
+export default function NavIQ() {
+  return (
+    <div className="flex min-h-screen bg-gray-100 font-sans">
+      <Sidebar className="w-20 lg:w-64 bg-[#0A2342] text-white p-4 shadow-lg">
+        <div className="flex flex-col space-y-4 mt-10">
+          <div className="flex items-center space-x-2">
+            <LayoutDashboard size={20} />
+            <span className="hidden lg:inline">Dashboard</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <BarChart2 size={20} />
+            <span className="hidden lg:inline">Analytics</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Settings size={20} />
+            <span className="hidden lg:inline">Settings</span>
+          </div>
+        </div>
+      </Sidebar>
 
-# Sidebar navigation
-page = st.sidebar.radio("Navigate", ["Main Dashboard", "Performance", "Research"])
+      <main className="flex-1 p-6 space-y-6">
+        <h1 className="text-3xl font-bold text-[#0A2342]">NavIQ Dashboard</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Card className="rounded-2xl shadow p-4">
+            <CardContent>
+              <h2 className="text-xl font-semibold text-[#1E3A8A]">Net Asset Value</h2>
+              <p className="text-2xl mt-2">$248,400</p>
+            </CardContent>
+          </Card>
 
-# Sample NAV data for portfolio value chart
-nav_data = pd.DataFrame({
-    "Month": ["Feb 2025", "Mar 2025", "Apr 2025"],
-    "NAV": [5000, 8300, 11000]
-})
+          <Card className="rounded-2xl shadow p-4">
+            <CardContent>
+              <h2 className="text-xl font-semibold text-[#1E3A8A]">Premium Earned</h2>
+              <p className="text-2xl mt-2">$6,740</p>
+            </CardContent>
+          </Card>
 
-# Sample tracker data
-tracker = pd.DataFrame([
-    {"Month": "Feb 2025", "Gross_Premium": 83, "Capital_Deployed": 5200, "Realized_Losses": 0},
-    {"Month": "Mar 2025", "Gross_Premium": 322, "Capital_Deployed": 7700, "Realized_Losses": 50},
-    {"Month": "Apr 2025", "Gross_Premium": 380, "Capital_Deployed": 9500, "Realized_Losses": 56.10},
-])
+          <Card className="rounded-2xl shadow p-4">
+            <CardContent>
+              <h2 className="text-xl font-semibold text-[#1E3A8A]">Capital Deployment</h2>
+              <p className="text-2xl mt-2">82%</p>
+            </CardContent>
+          </Card>
+        </div>
 
-tracker["Gross_Yield_%"] = (tracker["Gross_Premium"] / tracker["Capital_Deployed"]) * 100
-tracker["Net_Premium"] = tracker["Gross_Premium"] - tracker["Realized_Losses"]
-tracker["Net_Yield_%"] = (tracker["Net_Premium"] / tracker["Capital_Deployed"]) * 100
-
-# Main Dashboard view
-if page == "Main Dashboard":
-    st.subheader("📈 Portfolio Value Over Time")
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=nav_data["Month"],
-        y=nav_data["NAV"],
-        mode='lines+markers',
-        line=dict(width=3, shape='spline'),
-        marker=dict(size=8),
-        name="NAV"
-    ))
-    fig.update_layout(
-        height=400,
-        margin=dict(l=20, r=20, t=20, b=20),
-        xaxis_title="Month",
-        yaxis_title="Portfolio Value ($)",
-        template="plotly_white"
-    )
-    st.plotly_chart(fig, use_container_width=True)
-
-    st.subheader("🧾 Monthly Performance Snapshot")
-    st.dataframe(tracker.style.format({
-        "Gross_Premium": "$ {:.2f}",
-        "Capital_Deployed": "$ {:.0f}",
-        "Realized_Losses": "$ {:.2f}",
-        "Gross_Yield_%": "{:.2f}%",
-        "Net_Premium": "$ {:.2f}",
-        "Net_Yield_%": "{:.2f}%"
-    }), use_container_width=True)
-
-# Performance tab placeholder
-elif page == "Performance":
-    st.subheader("📊 Detailed Sleeve & Ticker Analytics Coming Soon")
-
-# Research tab implementation
-elif page == "Research":
-    st.title("🔍 Research Workspace")
-
-    st.subheader("📥 Ticker Selector or Upload")
-    ticker_input = st.text_input("Enter ticker symbol (e.g., AAPL)")
-    file_upload = st.file_uploader("Or upload a file with tickers", type=["csv", "xlsx"])
-
-    if ticker_input or file_upload:
-        st.subheader("📊 Ticker Analysis Preview")
-        st.info("GPT-based financial summary, earnings analysis, and trend notes will appear here.")
-    else:
-        st.warning("Enter a ticker or upload a file to begin analysis.")
-
-    st.subheader("✅ Decision Tracker")
-    decision = st.radio("Action", ["Add to Vault", "Needs More Info", "Reject"])
-    notes = st.text_area("Optional Notes", placeholder="Add interim thoughts or research notes...")
-
-    if st.button("Save Analysis Decision"):
-        st.success("Analysis decision saved for this ticker (simulated).")
-
-    st.markdown("---")
-    st.caption("This is a working area. Nothing here is committed to the Vault unless explicitly added.")
+        <Button className="bg-[#00BFFF] text-white hover:bg-[#009ACD] rounded-xl mt-6">
+          Update Portfolio Data
+        </Button>
+      </main>
+    </div>
+  );
+}
